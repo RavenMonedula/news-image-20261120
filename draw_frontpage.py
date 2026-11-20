@@ -1,24 +1,18 @@
 #!/usr/bin/env python3
-"""Front page v2 for news-image-20261120 — Friday 20 November 2026.
-REDESIGNED after the user's note that v1 reused the 20261119 concept
-(navy header block, UTC strip, dotted map, 4x3 medium grid). v2 follows
-the top-4 entries' concept instead:
-  - light paper header: small masthead line, big black serif date title,
-    red subtitle; NO navy block, NO UTC strip.
-  - BY THE NUMBERS strip (6 stats) directly under the subtitle.
-  - coloured region bar.
-  - 3 illustrated heroes.
-  - 10 medium stories in a 5x2 grid (each with a small art strip).
-  - SOLID landmass map (recoloured worldmap: cream land on navy ocean),
-    not the dotted map.
-  - ALSO list (23 stories, 2 columns).
-  - DATE CHECK in a red-bordered box.
-  - footer.
-36 stories total. Same verified Friday facts as v1 (Akvan 370,000
-evacuated; Kyiv 3 bridges, 3 killed; Taiex -6.8%, Kospi -5.4%,
+"""Front page v3 for news-image-20261120 — Friday 20 November 2026.
+v3 improves on v2 (98.5964%, rank 86) at the user's direction:
+  - the ALSO ON FRIDAY section at the bottom is BIGGER and more
+    interesting: larger type, taller rows, and a coloured number chip
+    for every story.
+  - the story numbers 1-36 are COLOURFUL: each number sits in a circle
+    coloured by its region (same colours as the region bar), so the
+    page's numbering doubles as a region key.
+Same top-4 concept as v2 (light header, BY THE NUMBERS x6, 5x2 medium,
+solid map, DATE CHECK box) and the same verified Friday facts (Akvan
+370,000 evacuated; Kyiv 3 bridges, 3 killed; Taiex -6.8%, Kospi -5.4%,
 Nikkei -4.9%; COP31 final day, no deal, $120bn dropped). Own story
 selection and wording; the winning FORMULA is followed, never the content.
-Saves to repo/entry.png (1024x1024, <1 MiB)."""
+Saves to entry.png (1024x1024, <1 MiB)."""
 from PIL import Image, ImageDraw, ImageFont
 import math, os
 
@@ -57,13 +51,37 @@ F_DECK2 = font("DejaVuSans.ttf", 10)
 F_SECT  = font("DejaVuSans-Bold.ttf", 11)
 F_BIGN  = font("DejaVuSerif-Bold.ttf", 20)
 F_BIGL  = font("DejaVuSans.ttf", 9)
-F_ALSO_N= font("DejaVuSans-Bold.ttf", 8)
-F_ALSO_B= font("DejaVuSans-Bold.ttf", 8)
-F_ALSO  = font("DejaVuSans.ttf", 8)
+F_ALSO_N= font("DejaVuSans-Bold.ttf", 9)
+F_ALSO_B= font("DejaVuSans-Bold.ttf", 9)
+F_ALSO  = font("DejaVuSans.ttf", 9)
 F_MAPN  = font("DejaVuSans-Bold.ttf", 10)
 F_FOOT  = font("DejaVuSans.ttf", 8)
 F_MAPC  = font("DejaVuSans.ttf", 9)
 F_REG   = font("DejaVuSans-Bold.ttf", 9)
+
+# Region colours (same as the region bar) and each story's region,
+# so the numbers 1-36 are colourful and double as a region key.
+REGION_COLORS = {
+    "ASIA": (122, 63, 146),
+    "MIDDLE EAST": (180, 132, 26),
+    "EUROPE": (0, 74, 137),
+    "AFRICA": (122, 74, 26),
+    "AMERICAS": (0, 128, 128),
+    "OCEANIA": (46, 125, 90),
+    "WORLD": (58, 58, 58),
+}
+STORY_REGION = {
+    1: "ASIA", 2: "EUROPE", 3: "ASIA",
+    4: "WORLD", 5: "WORLD", 6: "AMERICAS", 7: "OCEANIA", 8: "AFRICA",
+    9: "OCEANIA", 10: "AMERICAS", 11: "AMERICAS", 12: "EUROPE", 13: "AMERICAS",
+    14: "AMERICAS", 15: "MIDDLE EAST", 16: "MIDDLE EAST", 17: "AMERICAS",
+    18: "EUROPE", 19: "EUROPE", 20: "EUROPE", 21: "ASIA", 22: "AMERICAS",
+    23: "EUROPE", 24: "AMERICAS", 25: "ASIA", 26: "AFRICA", 27: "OCEANIA",
+    28: "ASIA", 29: "WORLD", 30: "ASIA", 31: "ASIA", 32: "OCEANIA",
+    33: "EUROPE", 34: "AMERICAS", 35: "OCEANIA", 36: "OCEANIA",
+}
+def region_color(n):
+    return REGION_COLORS[STORY_REGION[n]]
 
 img = Image.new("RGB", (W, H), PAPER)
 d = ImageDraw.Draw(img)
@@ -88,8 +106,8 @@ def textlines(x, y, lines, fnt, fill, lh):
         y += lh
     return y
 
-def circle_num(cx, cy, r, num, fnt):
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=RED)
+def circle_num(cx, cy, r, num, fnt, fill=RED):
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill)
     bb = d.textbbox((0, 0), num, font=fnt)
     tw, th = bb[2] - bb[0], bb[3] - bb[1]
     d.text((cx - tw / 2 - bb[0], cy - th / 2 - bb[1]), num, font=fnt, fill=(255, 255, 255))
@@ -216,7 +234,7 @@ for i, h in enumerate(HEROES):
     cw = d.textlength(h["cap"], font=F_CAP)
     d.text((x + (HW - cw) / 2, HY_IMG + HIMG_H - 13), h["cap"], font=F_CAP, fill=(255, 255, 255))
     ky = HY_IMG + HIMG_H + 8
-    circle_num(x + 11, ky + 11, 11, str(i + 1), F_NUM)
+    circle_num(x + 11, ky + 11, 11, str(i + 1), F_NUM, region_color(i + 1))
     d.text((x + 26, ky + 2), h["kick"], font=F_KICK, fill=RED)
     hy = ky + 26
     textlines(x, hy, wrap(h["head"], F_HERO_H, HW), F_HERO_H, INK, 21)
@@ -360,7 +378,7 @@ for i, (kick, head, deck) in enumerate(MED):
     y = MROW_Y[r]
     img.paste(MED_ICONS[i](MBW, 34), (x, y))
     ky = y + 38
-    circle_num(x + 9, ky + 8, 9, str(i + 4), F_NUM2)
+    circle_num(x + 9, ky + 8, 9, str(i + 4), F_NUM2, region_color(i + 4))
     d.text((x + 22, ky), kick, font=F_KICK2, fill=RED)
     hy = ky + 15
     textlines(x, hy, wrap(head, F_MED_H, MBW), F_MED_H, INK, 15)
@@ -417,7 +435,7 @@ MARKERS = [
 ]
 for i, (lon, lat, dx, dy) in enumerate(MARKERS, start=1):
     mx, my = map_xy(lon, lat)
-    circle_num(mx + dx, my + dy, 9, str(i), F_MAPN)
+    circle_num(mx + dx, my + dy, 9, str(i), F_MAPN, region_color(i))
 d.text((MAP_X, 826), "Numbered dots mark stories 1\u201313.", font=F_MAPC, fill=MUTED)
 
 # ALSO list 14-36 (23 stories, own selection + wording)
@@ -426,45 +444,47 @@ AW = 652
 d.text((AX, 656), "ALSO ON FRIDAY 20 NOVEMBER \u2014 23 MORE STORIES", font=F_SECT, fill=INK)
 d.rectangle([AX, 670, AX + AW, 672], fill=RED)
 ALSO = [
-    ("Cincinnati: Fiona the hippo dies", "aged 9, after swallowing a hat."),
-    ("Gaza: aid groups score the peace plan", "implementation 4 out of 20."),
-    ("Hormuz: four attacks on vessels", "in 96 hours, maritime centre says."),
-    ("Washington: the US war on Iran has cost $48.3bn", "Pentagon says."),
-    ("UK and Norway fund \u00a3100m-plus", "for two Ukrainian naval craft."),
+    ("Cincinnati: Fiona the hippo dies", "aged 9, swallowed a hat."),
+    ("Gaza: aid groups score peace plan", "implementation 4 of 20."),
+    ("Hormuz: four attacks on vessels", "in 96 hours, centre says."),
+    ("Washington: US war on Iran cost $48.3bn", "Pentagon says."),
+    ("UK and Norway fund \u00a3100m-plus", "for two naval craft."),
     ("Belgrade: Cupic elected speaker", "of Serbia\u2019s new parliament."),
-    ("Copenhagen: Denmark passes asset-forfeiture bill", "in parliament."),
-    ("Jakarta: Indonesia passes asset-forfeiture bill", "in parliament."),
+    ("Copenhagen: Denmark passes bill", "on asset forfeiture."),
+    ("Jakarta: Indonesia passes bill", "on asset forfeiture."),
     ("Denver: Democrats stay divided", "despite midterm wins."),
-    ("Dublin: Harris seeks border-poll criteria talks", "with London."),
+    ("Dublin: Harris seeks border-poll talks", "with London."),
     ("Los Angeles: Thomas Markle is found fit", "to stand trial."),
     ("Punjab: a truck driver wins $1.3m", "in a Diwali lottery."),
-    ("Johannesburg: DJ Lag on GTA 6 soundtrack", "celebrates the feature."),
+    ("Johannesburg: DJ Lag on GTA 6", "celebrates the feature."),
     ("Sydney: ASX futures fall 1%", "jobless rate rises to 4.9%."),
-    ("Mumbai: Sensex slips at Friday\u2019s open", "Nifty stands at 25,199."),
-    ("Antalya: pledges point to about 2.6\u00b0C of warming", "UNEP says."),
-    ("New Delhi: Pakistan minister to lead trip", "to Delhi for SCO dialogue."),
+    ("Mumbai: Sensex slips at open", "Nifty stands at 25,199."),
+    ("Antalya: pledges point to 2.6\u00b0C warming", "UNEP says."),
+    ("New Delhi: Pakistan minister leads", "SCO trip to Delhi."),
     ("Tokyo: PM Takaichi seeks continued dialogue", "with China."),
-    ("Canberra: Australia sanctions settler groups", "in the West Bank."),
-    ("Sofia: LPG tanker off Bulgaria hit by projectiles", "crew safe."),
-    ("Washington: US files emergency court request", "on Venezuelan TPS."),
-    ("Cook Is.: Cyclone Xavier nears Nassau", "emergency declared."),
-    ("Wellington: Nicholls makes 175 not out", "NZ 368 all out; India 159\u20131."),
+    ("Canberra: Australia sanctions settlers", "in the West Bank."),
+    ("Sofia: LPG tanker off Bulgaria hit", "by projectiles, crew safe."),
+    ("Washington: US files emergency bid", "on Venezuelan TPS."),
+    ("Cook Is.: Xavier nears Nassau", "emergency declared."),
+    ("Wellington: Nicholls makes 175*", "NZ 368; India 159\u20131."),
 ]
 COLW = 320
 COLX = [AX, AX + COLW + 12]
-ROW_H = 10
+ROW_H = 14
 for i, (title, detail) in enumerate(ALSO):
     col, row = divmod(i, 12)
     x = COLX[col]
-    y = 678 + row * ROW_H
-    num = str(i + 14)
-    cx = x
-    for txt, fnt, fill in [(num + ". ", F_ALSO_N, RED), (title, F_ALSO_B, INK),
+    y = 676 + row * ROW_H
+    n = i + 14
+    # coloured number chip (region colour), then the story text
+    circle_num(x + 7, y + 6, 7, str(n), F_ALSO_N, region_color(n))
+    cx = x + 17
+    for txt, fnt, fill in [(title, F_ALSO_B, INK),
                            (" \u2014 " + detail, F_ALSO, INK)]:
         d.text((cx, y), txt, font=fnt, fill=fill)
         cx += d.textlength(txt, font=fnt)
     if cx > x + COLW:
-        print("OVERFLOW also", num, title, "width", round(cx - x), ">", COLW)
+        print("OVERFLOW also", str(n), title, "width", round(cx - x), ">", COLW)
 
 # ---------------- DATE CHECK (red box) + FOOTER ----------------
 d.rectangle([MX, 856, W - MX, 912], outline=RED, width=2)
