@@ -4,7 +4,7 @@ REDESIGNED after the user's note that v1 reused the 20261119 concept
 (navy header block, UTC strip, dotted map, 4x3 medium grid). v2 follows
 the top-4 entries' concept instead:
   - light paper header: small masthead line, big black serif date title,
-    red-italic subtitle; NO navy block, NO UTC strip.
+    red subtitle; NO navy block, NO UTC strip.
   - BY THE NUMBERS strip (6 stats) directly under the subtitle.
   - coloured region bar.
   - 3 illustrated heroes.
@@ -409,7 +409,7 @@ MARKERS = [
     (-77.0, 38.9, 0, 0),     # 6 Washington
     (174.8, -41.3, 0, 0),    # 7 Wellington
     (-17.4, 14.7, 0, 0),     # 8 Senegal (Dakar)
-    (-175.2, -21.1, 12, 0),   # 9 Tonga (nudged right, sits on the dateline edge)
+    (-175.2, -21.1, 12, 0),  # 9 Tonga (nudged right, sits on the dateline edge)
     (-77.0, 38.9, 14, 12),   # 10 Washington (offset from 6)
     (-74.0, 40.7, 0, 0),     # 11 New York
     (13.4, 52.5, 0, 0),      # 12 Berlin
@@ -481,6 +481,6 @@ d.text((MX, 932), "Every story here happened or was first reported on Friday 20 
 d.text((MX, 944), "Sources: Reuters \u00b7 AP \u00b7 AFP \u00b7 BBC \u00b7 The Hindu \u00b7 IMD \u00b7 ICC \u00b7 UNEP. Original drawings.",
        font=F_FOOT, fill=MUTED)
 
-out = os.path.join(BASE, "repo", "entry.png")
+out = os.path.join(BASE, "entry.png")
 img.save(out, "PNG")
 print("saved", out, img.size, os.path.getsize(out), "bytes")
