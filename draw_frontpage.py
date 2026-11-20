@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
-"""Front page v3 for news-image-20261120 — Friday 20 November 2026.
-v3 improves on v2 (98.5964%, rank 86) at the user's direction:
-  - the ALSO ON FRIDAY section at the bottom is BIGGER and more
-    interesting: larger type, taller rows, and a coloured number chip
-    for every story.
-  - the story numbers 1-36 are COLOURFUL: each number sits in a circle
-    coloured by its region (same colours as the region bar), so the
-    page's numbering doubles as a region key.
-Same top-4 concept as v2 (light header, BY THE NUMBERS x6, 5x2 medium,
-solid map, DATE CHECK box) and the same verified Friday facts (Akvan
-370,000 evacuated; Kyiv 3 bridges, 3 killed; Taiex -6.8%, Kospi -5.4%,
-Nikkei -4.9%; COP31 final day, no deal, $120bn dropped). Own story
-selection and wording; the winning FORMULA is followed, never the content.
+"""Front page v4 for news-image-20261120 — Friday 20 November 2026.
+v4 reworks v3 at the user's direction:
+  - numbers 1-36 are HARMONIOUS again: one single accent (red) for
+    every number, no rainbow. The bigger ALSO section and its number
+    chips stay, but the chips are red too.
+  - the drawings are IMPROVED (own art): a richer cyclone spiral with
+    an eye and coastline, missile trails over the Kyiv bridge, and a
+    fuller market chart with the three index falls drawn in.
+  - the news was re-checked against the top-4 reference images the
+    user sent: same 36 stories, same verified Friday facts (Akvan
+    370,000 evacuated; Kyiv 3 bridges, 3 killed; Taiex -6.8%, Kospi
+    -5.4%, Nikkei -4.9%; COP31 final day, no deal, $120bn dropped).
+Same top-4 concept (light header, BY THE NUMBERS x6, 5x2 medium,
+solid map, DATE CHECK box). Own story selection and wording; the
+winning FORMULA is followed, never the content.
 Saves to entry.png (1024x1024, <1 MiB)."""
 from PIL import Image, ImageDraw, ImageFont
 import math, os
@@ -58,30 +60,6 @@ F_MAPN  = font("DejaVuSans-Bold.ttf", 10)
 F_FOOT  = font("DejaVuSans.ttf", 8)
 F_MAPC  = font("DejaVuSans.ttf", 9)
 F_REG   = font("DejaVuSans-Bold.ttf", 9)
-
-# Region colours (same as the region bar) and each story's region,
-# so the numbers 1-36 are colourful and double as a region key.
-REGION_COLORS = {
-    "ASIA": (122, 63, 146),
-    "MIDDLE EAST": (180, 132, 26),
-    "EUROPE": (0, 74, 137),
-    "AFRICA": (122, 74, 26),
-    "AMERICAS": (0, 128, 128),
-    "OCEANIA": (46, 125, 90),
-    "WORLD": (58, 58, 58),
-}
-STORY_REGION = {
-    1: "ASIA", 2: "EUROPE", 3: "ASIA",
-    4: "WORLD", 5: "WORLD", 6: "AMERICAS", 7: "OCEANIA", 8: "AFRICA",
-    9: "OCEANIA", 10: "AMERICAS", 11: "AMERICAS", 12: "EUROPE", 13: "AMERICAS",
-    14: "AMERICAS", 15: "MIDDLE EAST", 16: "MIDDLE EAST", 17: "AMERICAS",
-    18: "EUROPE", 19: "EUROPE", 20: "EUROPE", 21: "ASIA", 22: "AMERICAS",
-    23: "EUROPE", 24: "AMERICAS", 25: "ASIA", 26: "AFRICA", 27: "OCEANIA",
-    28: "ASIA", 29: "WORLD", 30: "ASIA", 31: "ASIA", 32: "OCEANIA",
-    33: "EUROPE", 34: "AMERICAS", 35: "OCEANIA", 36: "OCEANIA",
-}
-def region_color(n):
-    return REGION_COLORS[STORY_REGION[n]]
 
 img = Image.new("RGB", (W, H), PAPER)
 d = ImageDraw.Draw(img)
@@ -161,31 +139,50 @@ def hero_cyclone(w, h):
     s = Image.new("RGB", (w, h), (28, 41, 71))
     dd = ImageDraw.Draw(s)
     cx, cy = w // 2 - 30, h // 2
-    for r in (38, 30, 22, 14):
-        dd.arc([cx - r, cy - r, cx + r, cy + r], start=200, end=470,
-               fill=(255, 255, 255), width=5)
-    dd.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=(240, 200, 90))
+    # outer rain bands (faint arcs)
+    for r, a0, a1 in [(52, 200, 280), (58, 20, 90)]:
+        dd.arc([cx - r, cy - r, cx + r, cy + r], start=a0, end=a1,
+               fill=(150, 165, 195), width=3)
+    # main spiral: six arcs, each offset, thinning toward the eye
+    for k, r in enumerate((42, 34, 27, 20, 14, 9)):
+        dd.arc([cx - r, cy - r, cx + r, cy + r], start=200 + k * 35, end=470 + k * 35,
+               fill=(255, 255, 255), width=5 if k < 4 else 4)
+    # the eye: white ring with a dark centre
+    dd.ellipse([cx - 7, cy - 7, cx + 7, cy + 7], fill=(255, 255, 255))
+    dd.ellipse([cx - 3, cy - 3, cx + 3, cy + 3], fill=(28, 41, 71))
+    # coastline with two hill ridges on the right
     dd.polygon([(w - 90, h), (w - 60, 30), (w - 20, 10), (w, 20), (w, h)],
                fill=(42, 157, 143))
+    dd.polygon([(w - 60, h), (w - 40, 55), (w - 10, 45), (w, 55), (w, h)],
+               fill=(46, 125, 90))
     dd.text((w - 84, h - 18), "ODISHA", font=font("DejaVuSans-Bold.ttf", 9),
             fill=(255, 255, 255))
     return s
 
 def hero_kyiv(w, h):
-    s = Image.new("RGB", (w, h), (232, 224, 200))
+    s = Image.new("RGB", (w, h), (30, 38, 68))
     dd = ImageDraw.Draw(s)
-    dd.rectangle([0, h - 26, w, h], fill=(0, 74, 137))
-    dd.rectangle([0, h - 52, w, h - 46], fill=(60, 60, 60))
+    # stars in the night sky
+    for sx, sy in [(20, 12), (70, 8), (140, 16), (200, 10), (280, 18), (250, 30)]:
+        dd.ellipse([sx, sy, sx + 2, sy + 2], fill=(220, 225, 240))
+    # missile trails: bright streaks from the top-right down to the bridge
+    for t0, t1 in [((170, 0), (120, 52)), ((230, 0), (200, 50)), ((285, 4), (262, 50))]:
+        dd.line([t0, t1], fill=(255, 170, 60), width=3)
+        dd.ellipse([t1[0] - 3, t1[1] - 3, t1[0] + 3, t1[1] + 3], fill=(255, 220, 120))
+    # river below the deck
+    dd.rectangle([0, h - 26, w, h], fill=(20, 50, 90))
+    # bridge deck and towers
+    dd.rectangle([0, h - 52, w, h - 46], fill=(205, 210, 220))
     for tx in (60, 150, 240):
-        dd.rectangle([tx - 4, h - 86, tx + 4, h - 46], fill=(60, 60, 60))
-        dd.line([tx, h - 86, tx - 40, h - 52], fill=(120, 120, 120), width=2)
-        dd.line([tx, h - 86, tx + 40, h - 52], fill=(120, 120, 120), width=2)
+        dd.rectangle([tx - 4, h - 86, tx + 4, h - 46], fill=(205, 210, 220))
+        dd.line([tx, h - 86, tx - 40, h - 52], fill=(160, 165, 180), width=2)
+        dd.line([tx, h - 86, tx + 40, h - 52], fill=(160, 165, 180), width=2)
+    # fireballs with smoke on the deck
     for ex, ey, r in ((120, h - 56, 12), (210, h - 54, 9), (270, h - 58, 7)):
+        dd.ellipse([ex - r - 2, ey - r - 6, ex + r + 2, ey + r], fill=(120, 120, 130))
         dd.ellipse([ex - r, ey - r, ex + r, ey + r], fill=(255, 120, 0))
         dd.ellipse([ex - r // 2, ey - r // 2, ex + r // 2, ey + r // 2],
                    fill=(255, 220, 0))
-    for sx, sy in ((120, h - 78), (210, h - 74)):
-        dd.ellipse([sx - 10, sy - 6, sx + 10, sy + 6], fill=(120, 120, 120))
     return s
 
 def hero_markets(w, h):
@@ -199,6 +196,8 @@ def hero_markets(w, h):
     dd.polygon([(290, 72), (276, 68), (286, 56)], fill=(255, 60, 60))
     dd.text((12, 4), "TAIEX -6.8%", font=font("DejaVuSans-Bold.ttf", 13),
             fill=(255, 255, 255))
+    dd.text((w - 100, 4), "KOSPI -5.4%", font=font("DejaVuSans-Bold.ttf", 11),
+            fill=(255, 200, 200))
     dd.text((w - 96, h - 20), "NIKKEI -4.9%", font=font("DejaVuSans-Bold.ttf", 11),
             fill=(255, 200, 200))
     return s
@@ -234,7 +233,7 @@ for i, h in enumerate(HEROES):
     cw = d.textlength(h["cap"], font=F_CAP)
     d.text((x + (HW - cw) / 2, HY_IMG + HIMG_H - 13), h["cap"], font=F_CAP, fill=(255, 255, 255))
     ky = HY_IMG + HIMG_H + 8
-    circle_num(x + 11, ky + 11, 11, str(i + 1), F_NUM, region_color(i + 1))
+    circle_num(x + 11, ky + 11, 11, str(i + 1), F_NUM)
     d.text((x + 26, ky + 2), h["kick"], font=F_KICK, fill=RED)
     hy = ky + 26
     textlines(x, hy, wrap(h["head"], F_HERO_H, HW), F_HERO_H, INK, 21)
@@ -378,7 +377,7 @@ for i, (kick, head, deck) in enumerate(MED):
     y = MROW_Y[r]
     img.paste(MED_ICONS[i](MBW, 34), (x, y))
     ky = y + 38
-    circle_num(x + 9, ky + 8, 9, str(i + 4), F_NUM2, region_color(i + 4))
+    circle_num(x + 9, ky + 8, 9, str(i + 4), F_NUM2)
     d.text((x + 22, ky), kick, font=F_KICK2, fill=RED)
     hy = ky + 15
     textlines(x, hy, wrap(head, F_MED_H, MBW), F_MED_H, INK, 15)
@@ -435,7 +434,7 @@ MARKERS = [
 ]
 for i, (lon, lat, dx, dy) in enumerate(MARKERS, start=1):
     mx, my = map_xy(lon, lat)
-    circle_num(mx + dx, my + dy, 9, str(i), F_MAPN, region_color(i))
+    circle_num(mx + dx, my + dy, 9, str(i), F_MAPN)
 d.text((MAP_X, 826), "Numbered dots mark stories 1\u201313.", font=F_MAPC, fill=MUTED)
 
 # ALSO list 14-36 (23 stories, own selection + wording)
@@ -476,8 +475,8 @@ for i, (title, detail) in enumerate(ALSO):
     x = COLX[col]
     y = 676 + row * ROW_H
     n = i + 14
-    # coloured number chip (region colour), then the story text
-    circle_num(x + 7, y + 6, 7, str(n), F_ALSO_N, region_color(n))
+    # red number chip, then the story text
+    circle_num(x + 7, y + 6, 7, str(n), F_ALSO_N)
     cx = x + 17
     for txt, fnt, fill in [(title, F_ALSO_B, INK),
                            (" \u2014 " + detail, F_ALSO, INK)]:
