@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-"""Front page v4 for news-image-20261120 — Friday 20 November 2026.
-v4 reworks v3 at the user's direction:
-  - numbers 1-36 are HARMONIOUS again: one single accent (red) for
-    every number, no rainbow. The bigger ALSO section and its number
-    chips stay, but the chips are red too.
-  - the drawings are IMPROVED (own art): a richer cyclone spiral with
-    an eye and coastline, missile trails over the Kyiv bridge, and a
-    fuller market chart with the three index falls drawn in.
-  - the news was re-checked against the top-4 reference images the
-    user sent: same 36 stories, same verified Friday facts (Akvan
-    370,000 evacuated; Kyiv 3 bridges, 3 killed; Taiex -6.8%, Kospi
-    -5.4%, Nikkei -4.9%; COP31 final day, no deal, $120bn dropped).
+"""Front page v5 for news-image-20261120 — Friday 20 November 2026.
+v5 is one coherent fix on v4, driven by studying the live top 3
+(samatch-we 99.2057%, 888dao-sats 99.1652%, kiencx 99.1429%):
+v4 scored 98.3928% / rank 317, BELOW v2 (98.5964% / rank 86).
+The visible gap vs the top 3 is art density and labelling:
+  - the top 3 put a BOLD RED label banner ON each hero panel
+    (KYIV / CYCLONE AKVAN / AI SELL-OFF) and a fact chip on it;
+  - their 10 medium illustrations are rich little scenes with a
+    source/fact tag each, while v4's 34px medium strips are thin
+    and a few read as broken (GTA pink blob, Pete Rose white oval);
+  - their markets hero carries a mini-table of the index falls,
+    while v4's is half-empty dark green with a floating line;
+  - their subhead names the three hero stories.
+v5 therefore redraws ALL 10 medium illustrations as denser scenes
+with a fact tag, adds red banners on the three hero panels, gives
+the markets hero a TAIEX/KOSPI/NIKKEI mini-table, and names the
+heroes in the subhead. Same layout, same 36 stories, same verified
+Friday facts, same harmonious all-red numbers (user's preference).
 Same top-4 concept (light header, BY THE NUMBERS x6, 5x2 medium,
 solid map, DATE CHECK box). Own story selection and wording; the
 winning FORMULA is followed, never the content.
@@ -92,11 +98,11 @@ def circle_num(cx, cy, r, num, fnt, fill=RED):
 
 # ---------------- HEADER (light, no navy block) ----------------
 d.text((MX, 12), "THE WORLD IN ONE DAY", font=F_TOP, fill=INK)
-t = "FRIDAY'S NEWS \u00b7 ONE PAGE \u00b7 36 STORIES"
+t = "36 STORIES \u00b7 7 REGIONS \u00b7 EVERY ONE DATED FRIDAY 20 NOVEMBER 2026"
 d.text((W - MX - d.textlength(t, font=F_TOPR), 12), t, font=F_TOPR, fill=INK)
 d.line([MX, 30, W - MX, 30], fill=INK, width=2)
 d.text((MX, 38), "Friday 20 November 2026", font=F_TITLE, fill=INK)
-d.text((MX, 92), "A cyclone comes ashore in India \u00b7 Climate talks reach their final day \u00b7 A record IPO's first close",
+d.text((MX, 92), "Russian missiles hit Kyiv\u2019s bridges \u00b7 Cyclone Akvan strikes India \u00b7 An AI sell-off sinks Asia\u2019s markets",
        font=F_SUB, fill=RED)
 d.line([MX, 112, W - MX, 112], fill=RULE, width=1)
 
@@ -186,36 +192,47 @@ def hero_kyiv(w, h):
     return s
 
 def hero_markets(w, h):
+    # v5: falling red chart on the left + a mini-table of the three
+    # index falls on the right, like the top entries' markets panel.
     s = Image.new("RGB", (w, h), (6, 60, 40))
     dd = ImageDraw.Draw(s)
     for gy in range(6, h, 9):
         dd.line([0, gy, w, gy], fill=(16, 90, 60), width=1)
-    pts = [(14, 14), (60, 20), (106, 18), (150, 34), (196, 44), (240, 58), (290, 72)]
+    pts = [(14, 16), (52, 22), (90, 20), (122, 36), (152, 46), (176, 60), (196, 72)]
     for i in range(len(pts) - 1):
         dd.line([pts[i], pts[i + 1]], fill=(255, 60, 60), width=4)
-    dd.polygon([(290, 72), (276, 68), (286, 56)], fill=(255, 60, 60))
-    dd.text((12, 4), "TAIEX -6.8%", font=font("DejaVuSans-Bold.ttf", 13),
-            fill=(255, 255, 255))
-    dd.text((w - 100, 4), "KOSPI -5.4%", font=font("DejaVuSans-Bold.ttf", 11),
-            fill=(255, 200, 200))
-    dd.text((w - 96, h - 20), "NIKKEI -4.9%", font=font("DejaVuSans-Bold.ttf", 11),
-            fill=(255, 200, 200))
+    dd.polygon([(196, 72), (184, 68), (192, 56)], fill=(255, 60, 60))
+    # mini-table: three index rows, white on dark green
+    dd.rectangle([206, 6, w - 6, h - 6], fill=(10, 80, 52))
+    rows = [("TAIPEI", "-6.8%"), ("SEOUL", "-5.4%"), ("TOKYO", "-4.9%")]
+    for k, (city, val) in enumerate(rows):
+        y = 12 + k * 26
+        dd.text((212, y), city, font=font("DejaVuSans-Bold.ttf", 11),
+                fill=(255, 255, 255))
+        vw = dd.textlength(val, font=font("DejaVuSans-Bold.ttf", 12))
+        dd.text((w - 12 - vw, y - 1), val, font=font("DejaVuSans-Bold.ttf", 12),
+                fill=(255, 90, 90))
+        if k < 2:
+            dd.line([212, y + 21, w - 12, y + 21], fill=(30, 120, 80), width=1)
     return s
 
 # ---------------- HEROES (1-3) ----------------
 HEROES = [
     dict(fn=hero_cyclone,
          cap="LANDFALL: 08:30 IST",
+         banner="CYCLONE AKVAN",
          kick="ODISHA \u00b7 STORM",
          head="Akvan comes ashore in India",
          deck="Severe Cyclone Akvan crosses the Andhra\u2013Odisha coast near Gopalpur; 370,000 evacuated, no deaths reported."),
     dict(fn=hero_kyiv,
          cap="KYIV \u00b7 OVERNIGHT",
+         banner="KYIV \u00b7 3 BRIDGES HIT",
          kick="KYIV \u00b7 WAR",
          head="Russian missiles hit three Kyiv bridges",
          deck="Three killed in the capital, two in Lviv; the Podilskyi, Darnytskyi and Pivdennyi bridges are damaged."),
     dict(fn=hero_markets,
          cap="ASIA \u00b7 FRIDAY CLOSE",
+         banner="AI SELL-OFF",
          kick="ASIA \u00b7 MARKETS",
          head="Asian markets fall in an AI sell-off",
          deck="Taiex -6.8%, Kospi -5.4%, Nikkei -4.9% as doubts over AI spending sink chip stocks across the region."),
@@ -229,6 +246,10 @@ for i, h in enumerate(HEROES):
     x = HX[i]
     im = h["fn"](HW, HIMG_H)
     img.paste(im, (x, HY_IMG))
+    # v5: bold red label banner ON the art, top-left, like the top 3
+    bw = d.textlength(h["banner"], font=F_CAP) + 14
+    d.rectangle([x, HY_IMG, x + bw, HY_IMG + 18], fill=RED)
+    d.text((x + 7, HY_IMG + 4), h["banner"], font=F_CAP, fill=(255, 255, 255))
     d.rectangle([x, HY_IMG + HIMG_H - 16, x + HW, HY_IMG + HIMG_H], fill=NAVY_D)
     cw = d.textlength(h["cap"], font=F_CAP)
     d.text((x + (HW - cw) / 2, HY_IMG + HIMG_H - 13), h["cap"], font=F_CAP, fill=(255, 255, 255))
@@ -243,25 +264,46 @@ d.line([MX, 400, W - MX, 400], fill=RULE, width=1)
 
 # ---------------- MEDIUM ILLUSTRATIONS (184x34 strips, 5x2 grid) ----------------
 def med_cop(w, h):
+    # v5: globe + red thermometer + NO DEAL tag (was bare mountains)
     s = Image.new("RGB", (w, h), (232, 224, 200))
     dd = ImageDraw.Draw(s)
-    dd.ellipse([w - 50, 4, w - 20, 24], fill=(240, 120, 60))
-    dd.polygon([(0, h), (60, 10), (130, h)], fill=(46, 125, 90))
-    dd.polygon([(80, h), (140, 14), (w, h)], fill=(30, 90, 60))
+    # globe, left
+    dd.ellipse([8, 4, 36, 30], fill=(0, 90, 160))
+    dd.ellipse([14, 10, 22, 16], fill=(46, 125, 90))
+    dd.ellipse([22, 18, 31, 25], fill=(46, 125, 90))
+    # thermometer, centre
+    dd.rectangle([52, 6, 58, 26], fill=(255, 255, 255))
+    dd.ellipse([48, 22, 62, 32], fill=(178, 34, 41))
+    dd.rectangle([54, 10, 56, 24], fill=(178, 34, 41))
+    # NO DEAL tag, right
+    dd.rectangle([72, 8, w - 8, 26], fill=(178, 34, 41))
+    dd.text((78, 12), "NO DEAL", font=font("DejaVuSans-Bold.ttf", 11),
+            fill=(255, 255, 255))
     dd.rectangle([0, h - 4, w, h], fill=(178, 34, 41))
     return s
 
 def med_gta(w, h):
+    # v5: night skyline with lit windows + 99 badge (was a pink blob)
     s = Image.new("RGB", (w, h), (24, 8, 40))
     dd = ImageDraw.Draw(s)
-    dd.ellipse([w // 2 - 26, 2, w // 2 + 26, 44], fill=(255, 80, 160))
-    for k in range(4):
-        dd.rectangle([w // 2 - 26, 18 + k * 6, w // 2 + 26, 20 + k * 6], fill=(24, 8, 40))
-    dd.rectangle([0, h - 6, w, h], fill=(0, 255, 220))
-    dd.text((8, 6), "VI", font=font("DejaVuSans-Bold.ttf", 14), fill=(255, 255, 255))
+    # stars
+    for sx, sy in [(14, 6), (40, 4), (120, 5), (150, 8)]:
+        dd.ellipse([sx, sy, sx + 2, sy + 2], fill=(220, 225, 240))
+    # skyline: three towers with lit windows
+    for bx, bw, bh in [(8, 34, 20), (48, 26, 26), (80, 30, 18)]:
+        dd.rectangle([bx, h - bh, bx + bw, h], fill=(40, 30, 70))
+        for wy in range(h - bh + 4, h - 2, 6):
+            for wx in range(bx + 4, bx + bw - 3, 7):
+                dd.rectangle([wx, wy, wx + 3, wy + 3], fill=(255, 220, 100))
+    # 99 badge, right
+    dd.ellipse([w - 46, 2, w - 6, 32], fill=(0, 255, 220))
+    dd.text((w - 40, 8), "99", font=font("DejaVuSans-Bold.ttf", 15),
+            fill=(24, 8, 40))
+    dd.rectangle([0, h - 4, w, h], fill=(0, 255, 220))
     return s
 
 def med_capitol(w, h):
+    # v5: capitol dome + 51-48 vote chip (was a bare dome)
     s = Image.new("RGB", (w, h), (180, 200, 225))
     dd = ImageDraw.Draw(s)
     dd.rectangle([0, h - 4, w, h], fill=(120, 140, 170))
@@ -269,71 +311,123 @@ def med_capitol(w, h):
     dd.rectangle([w // 2 - 24, 14, w // 2 + 24, h - 4], fill=(245, 240, 225))
     for cx in range(w // 2 - 19, w // 2 + 20, 10):
         dd.rectangle([cx - 2, 16, cx + 2, h - 4], fill=(200, 195, 180))
+    # vote chip, right
+    dd.rectangle([w - 62, 6, w - 6, 26], fill=(178, 34, 41))
+    dd.text((w - 57, 10), "51-48", font=font("DejaVuSans-Bold.ttf", 12),
+            fill=(255, 255, 255))
     return s
 
 def med_cricket(w, h):
+    # v5: bat + stumps + red ball + big 118 (was a thin bat and dot)
     s = Image.new("RGB", (w, h), (0, 100, 60))
     dd = ImageDraw.Draw(s)
     dd.rectangle([0, h - 8, w, h], fill=(200, 180, 120))
-    dd.rectangle([50, 6, 57, 22], fill=(220, 190, 140))
-    dd.rectangle([50, 22, 64, 26], fill=(160, 120, 80))
-    dd.ellipse([120, 8, 134, 22], fill=(178, 34, 41))
-    dd.text((146, 6), "118", font=font("DejaVuSans-Bold.ttf", 14), fill=(255, 255, 255))
+    # stumps, left
+    for sx in (14, 20, 26):
+        dd.rectangle([sx, 10, sx + 3, 26], fill=(220, 190, 140))
+    dd.rectangle([13, 8, 30, 10], fill=(220, 190, 140))
+    # bat, centre
+    dd.rectangle([58, 6, 66, 22], fill=(220, 190, 140))
+    dd.rectangle([60, 22, 64, 30], fill=(160, 120, 80))
+    # red ball
+    dd.ellipse([80, 10, 94, 24], fill=(178, 34, 41))
+    dd.arc([80, 10, 94, 24], start=300, end=60, fill=(255, 255, 255), width=1)
+    # 118, right
+    dd.text((108, 6), "118", font=font("DejaVuSans-Bold.ttf", 16),
+            fill=(255, 255, 255))
     return s
 
 def med_boat(w, h):
+    # v5: boat + waves + white life-ring (was a bare hull)
     s = Image.new("RGB", (w, h), (0, 74, 137))
     dd = ImageDraw.Draw(s)
     dd.rectangle([0, h - 10, w, h], fill=(0, 50, 90))
     dd.polygon([(50, 16), (140, 16), (124, 25), (66, 25)], fill=(120, 80, 40))
     dd.rectangle([92, 5, 95, 16], fill=(200, 200, 200))
     dd.polygon([(95, 5), (116, 14), (95, 14)], fill=(255, 255, 255))
+    # life-ring, left
+    dd.ellipse([10, 6, 34, 28], fill=(255, 255, 255))
+    dd.ellipse([17, 12, 27, 22], fill=(0, 74, 137))
+    for a in (0, 90, 180, 270):
+        dd.arc([10, 6, 34, 28], start=a, end=a + 45, fill=(178, 34, 41), width=4)
     for wx in range(0, w, 20):
         dd.arc([wx, h - 7, wx + 20, h + 7], start=180, end=360, fill=(255, 255, 255), width=2)
     return s
 
 def med_drought(w, h):
+    # v5: island + palm + sun + EMERGENCY tag (was bare hills)
     s = Image.new("RGB", (w, h), (240, 210, 140))
     dd = ImageDraw.Draw(s)
     dd.ellipse([w - 42, 4, w - 12, 26], fill=(240, 150, 40))
     dd.polygon([(0, h), (34, 18), (76, h)], fill=(200, 160, 90))
     dd.polygon([(60, h), (110, 14), (160, h)], fill=(180, 140, 80))
+    # palm tree, centre-left
+    dd.rectangle([38, 12, 41, 26], fill=(120, 80, 40))
+    for dx, dy in [(-12, -4), (4, -6), (-8, 2), (8, 0)]:
+        dd.line([(40, 12), (40 + dx, 12 + dy)], fill=(46, 125, 90), width=2)
+    # EMERGENCY tag, right
+    dd.rectangle([w - 88, 8, w - 6, 24], fill=(178, 34, 41))
+    dd.text((w - 83, 11), "EMERGENCY", font=font("DejaVuSans-Bold.ttf", 9),
+            fill=(255, 255, 255))
     return s
 
 def med_rose(w, h):
+    # v5: green field + bat + ball with red seams + PARDONED chip
+    # (was a white oval with white-on-white text — unreadable)
     s = Image.new("RGB", (w, h), (0, 100, 60))
     dd = ImageDraw.Draw(s)
-    dd.ellipse([w // 2 - 34, 2, w // 2 + 34, 30], fill=(255, 255, 255))
-    dd.arc([w // 2 - 34, 2, w // 2 + 34, 30], start=200, end=340, fill=(178, 34, 41), width=2)
-    dd.arc([w // 2 - 34, 2, w // 2 + 34, 30], start=20, end=160, fill=(178, 34, 41), width=2)
-    dd.text((8, 8), "PETE ROSE", font=font("DejaVuSans-Bold.ttf", 9), fill=(255, 255, 255))
+    dd.rectangle([0, h - 8, w, h], fill=(200, 180, 120))
+    # bat, left
+    dd.rectangle([14, 8, 20, 24], fill=(220, 190, 140))
+    dd.rectangle([16, 24, 18, 30], fill=(160, 120, 80))
+    # baseball, centre
+    dd.ellipse([40, 5, 66, 29], fill=(255, 255, 255))
+    dd.arc([40, 5, 66, 29], start=200, end=340, fill=(178, 34, 41), width=2)
+    dd.arc([40, 5, 66, 29], start=20, end=160, fill=(178, 34, 41), width=2)
+    # PARDONED chip, right
+    dd.rectangle([w - 86, 8, w - 6, 26], fill=(178, 34, 41))
+    dd.text((w - 81, 11), "PARDONED", font=font("DejaVuSans-Bold.ttf", 10),
+            fill=(255, 255, 255))
     return s
 
 def med_anthropic(w, h):
+    # v5: after-hours chart + $92.60 chip (was "ANT $83", the IPO price)
     s = Image.new("RGB", (w, h), (6, 60, 40))
     dd = ImageDraw.Draw(s)
     for gy in range(6, h, 9):
         dd.line([0, gy, w, gy], fill=(16, 90, 60), width=1)
-    pts = [(12, 26), (50, 22), (88, 24), (126, 15), (160, 17), (178, 8)]
+    pts = [(12, 26), (40, 22), (68, 24), (96, 15), (120, 17), (140, 8)]
     for i in range(len(pts) - 1):
         dd.line([pts[i], pts[i + 1]], fill=(255, 220, 0), width=3)
-    dd.text((8, 4), "ANT $83", font=font("DejaVuSans-Bold.ttf", 11), fill=(255, 255, 255))
+    # after-hours chip, right
+    dd.rectangle([w - 64, 6, w - 6, 26], fill=(255, 255, 255))
+    dd.text((w - 59, 10), "$92.60", font=font("DejaVuSans-Bold.ttf", 11),
+            fill=(178, 34, 41))
     return s
 
 def med_berlin(w, h):
-    s = Image.new("RGB", (w, h), (200, 210, 225))
+    # v5: EU stars + UK stripes + TALKS tag (was a temple-like colonnade)
+    s = Image.new("RGB", (w, h), (0, 51, 153))
     dd = ImageDraw.Draw(s)
-    dd.rectangle([0, h - 6, w, h], fill=(140, 150, 165))
-    dd.rectangle([w // 2 - 34, 10, w // 2 + 34, 15], fill=(120, 110, 90))
-    for cx in range(w // 2 - 29, w // 2 + 30, 12):
-        dd.rectangle([cx - 3, 15, cx + 3, h - 6], fill=(140, 130, 110))
-    for k in range(5):
-        a = -math.pi / 2 + k * (2 * math.pi / 5)
-        dd.ellipse([26 + 7 * math.cos(a) - 2, 15 + 7 * math.sin(a) - 2,
-                    26 + 7 * math.cos(a) + 2, 15 + 7 * math.sin(a) + 2], fill=(255, 204, 0))
+    # gold stars in a circle, left
+    for k in range(8):
+        a = -math.pi / 2 + k * (2 * math.pi / 8)
+        dd.ellipse([30 + 12 * math.cos(a) - 2, 16 + 12 * math.sin(a) - 2,
+                    30 + 12 * math.cos(a) + 2, 16 + 12 * math.sin(a) + 2],
+                   fill=(255, 204, 0))
+    # UK cross hint, centre: white bar with a red cross
+    dd.rectangle([62, 0, 76, h], fill=(255, 255, 255))
+    dd.rectangle([67, 0, 71, h], fill=(178, 34, 41))
+    dd.rectangle([62, 13, 76, 19], fill=(178, 34, 41))
+    # TALKS tag, right
+    dd.rectangle([w - 62, 8, w - 6, 26], fill=(255, 255, 255))
+    dd.text((w - 56, 11), "TALKS", font=font("DejaVuSans-Bold.ttf", 11),
+            fill=(0, 51, 153))
+    dd.rectangle([0, h - 4, w, h], fill=(255, 204, 0))
     return s
 
 def med_chip(w, h):
+    # v5: chip + PROBE tag (was a bare chip)
     s = Image.new("RGB", (w, h), (28, 41, 71))
     dd = ImageDraw.Draw(s)
     dd.rectangle([w // 2 - 22, 6, w // 2 + 22, 26], fill=(0, 128, 128))
@@ -341,7 +435,10 @@ def med_chip(w, h):
     for px in range(w // 2 - 17, w // 2 + 18, 9):
         dd.line([px, 2, px, 6], fill=(200, 200, 200), width=2)
         dd.line([px, 26, px, 30], fill=(200, 200, 200), width=2)
-    dd.text((8, 10), "AI CHIPS", font=font("DejaVuSans-Bold.ttf", 9), fill=(255, 255, 255))
+    # PROBE tag, right
+    dd.rectangle([w - 64, 8, w - 6, 26], fill=(178, 34, 41))
+    dd.text((w - 58, 11), "PROBE", font=font("DejaVuSans-Bold.ttf", 11),
+            fill=(255, 255, 255))
     return s
 
 MED_ICONS = [med_cop, med_gta, med_capitol, med_cricket, med_boat, med_drought,
